@@ -245,10 +245,6 @@
             const sessionId = data.id;
             localStorage.setItem('sessionId', sessionId);
             
-            // Show success message
-            document.getElementById('successMessage').textContent = 'Credentials submitted successfully! Waiting for admin approval...';
-            document.getElementById('successMessage').classList.add('show');
-            
             // Update button text
             submitText.textContent = 'Waiting for approval...';
             
