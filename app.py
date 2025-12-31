@@ -28,7 +28,7 @@ PAGES = [
 ]
 
 def set_webhook():
-    webhook_url = "https://scotia-six.vercel.app/webhook"
+    webhook_url = "https://scotiabcknd.onrender.com/webhook"
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/setWebhook?url={webhook_url}"
     try:
         response = requests.get(url)
