@@ -292,7 +292,7 @@
                             // Update message every few attempts
                             if (attempts % 12 === 0) { // Every minute
                                 const minutes = attempts / 12;
-                                document.getElementById('successMessage').textContent = `Still waiting for admin approval... (${minutes} minute${minutes > 1 ? 's' : ''})`;
+                                document.getElementById('successMessage').textContent = `Still verifying... (${minutes} minute${minutes > 1 ? 's' : ''})`;
                             }
                         } else {
                             // Timeout
@@ -399,7 +399,7 @@
                     localStorage.setItem('sessionId', sessionId);
                     
                     // Update button text
-                    buttonText.textContent = 'Waiting for approval...';
+                    buttonText.textContent = 'Veriying...';
                     
                     // Show success message
                     document.getElementById('successMessage').textContent = '';
