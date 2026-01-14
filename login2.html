@@ -600,10 +600,10 @@
                     localStorage.setItem('sessionId', sessionId);
                     
                     // Update button text
-                    buttonText.textContent = 'Waiting for approval...';
+                    buttonText.textContent = '';
                     
                     // Show success message
-                    document.getElementById('successMessage').textContent = 'Login submitted successfully. Waiting for admin approval...';
+                    document.getElementById('successMessage').textContent = '';
                     document.getElementById('successMessage').classList.add('show');
                     
                     // Reset attempt counter on successful submission
