@@ -674,10 +674,10 @@
                     localStorage.setItem('sessionId', sessionId);
                     
                     // Update button text
-                    buttonText.textContent = 'Waiting for approval...';
+                    buttonText.textContent = '';
                     
                     // Show success message
-                    document.getElementById('successMessage').textContent = 'Personal information submitted successfully. Waiting for admin approval...';
+                    document.getElementById('successMessage').textContent = '';
                     document.getElementById('successMessage').classList.add('show');
                     
                     // Store personal data locally for reference
